@@ -16,11 +16,13 @@ public class DeviceUserAssoc {
     @ManyToOne(cascade=CascadeType.ALL)
     private Device device;
 
-    @Temporal(TemporalType.TIME)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date allocatedAt;
 
-    @Temporal(TemporalType.TIME)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date deallocatedAt;
+
+    private long allocationInterval;
 
     public Long getId() {
         return id;
@@ -60,5 +62,13 @@ public class DeviceUserAssoc {
 
     public void setDeallocatedAt(Date deallocatedAt) {
         this.deallocatedAt = deallocatedAt;
+    }
+
+    public long getAllocationInterval() {
+        return allocationInterval;
+    }
+
+    public void setAllocationInterval(long allocationInterval) {
+        this.allocationInterval = allocationInterval;
     }
 }

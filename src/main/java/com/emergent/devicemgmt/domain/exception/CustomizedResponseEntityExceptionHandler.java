@@ -22,7 +22,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
     @ExceptionHandler(DeviceNotFoundException.class)
-    public final ResponseEntity<ExceptionResponse> handleUserNotFoundException(
+    public final ResponseEntity<ExceptionResponse> handleDeviceNotFoundException(
             DeviceNotFoundException ex,
             WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
@@ -31,7 +31,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     }
 
     @ExceptionHandler(DeviceAlreadyAllocatedException.class)
-    public final ResponseEntity<ExceptionResponse> handleUserNotFoundException(
+    public final ResponseEntity<ExceptionResponse> handleDeviceAlreadyAllocatedException(
             DeviceAlreadyAllocatedException ex,
             WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
