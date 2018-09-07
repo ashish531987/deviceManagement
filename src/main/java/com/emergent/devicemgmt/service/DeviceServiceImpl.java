@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DeviceServiceImpl implements DeviceService {
@@ -18,13 +19,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public Device getDeviceForId(Long deviceId) {
-        return deviceJpaRepository.getOne(deviceId);
+    public Optional<Device> getDeviceForUniqueId(String uniqueId) {
+        return deviceJpaRepository.findByUniqueId(uniqueId);
     }
-
-    @Override
-    public Device getDeviceForUniqueId(String uniqueId) {
-        return deviceJpaRepository.findOneByUniqueId(uniqueId);
-    }
-
 }

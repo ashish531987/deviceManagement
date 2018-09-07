@@ -1,14 +1,12 @@
 package com.emergent.devicemgmt.service;
 
 import com.emergent.devicemgmt.domain.Device;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DeviceService {
     List<Device> getAllDevices();
 
-    Device getDeviceForId(Long deviceId);
-
-    Device getDeviceForUniqueId(String uniqueId);
+    Optional<Device> getDeviceForUniqueId(String uniqueId);
 }

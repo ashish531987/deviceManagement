@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class DeviceResource {
@@ -16,12 +17,8 @@ public class DeviceResource {
     public List<Device> devices(){
         return  deviceService.getAllDevices();
     }
-    @GetMapping(path="/devices/{deviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Device device(@PathVariable Long deviceId){
-        return  deviceService.getDeviceForId(deviceId);
-    }
-    @GetMapping(path="/devices/{uniqueId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Device device(@PathVariable String uniqueId){
-        return  deviceService.getDeviceForUniqueId(uniqueId);
+    @GetMapping(path="/devices/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<Device> device(@PathVariable("id") long uniqueId){
+        return  deviceService.getDeviceForUniqueId(String.valueOf(uniqueId));
     }
 }
