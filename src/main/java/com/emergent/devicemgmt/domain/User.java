@@ -26,7 +26,17 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name="role_id")})
     private Set<Role> roles = new HashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    private Set<DeviceUserAssoc> deviceUserAssocSet;
+
     public User(){}
+    public Set<DeviceUserAssoc> getDeviceUserAssocSet(){
+        return deviceUserAssocSet;
+    }
+
+    public void setDeviceUserAssocSet(Set<DeviceUserAssoc> deviceUserAssocSet){
+        this.deviceUserAssocSet = deviceUserAssocSet;
+    }
     public Long getId() {
         return id;
     }
