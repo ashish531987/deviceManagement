@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableGlobalMethodSecurity(securedEnabled = true)
-public class SecureConfig extends WebSecurityConfigurerAdapter {
+public class HttpBasicWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
     @Autowired
     private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
