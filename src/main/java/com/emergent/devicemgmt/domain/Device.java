@@ -1,5 +1,7 @@
 package com.emergent.devicemgmt.domain;
 
+import org.hibernate.annotations.Where;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +20,11 @@ public class Device {
 
     @OneToMany(mappedBy = "device")
     private Set<DeviceUserAssoc> deviceUserAssocSet = new HashSet<>();
+
+    @OneToMany(mappedBy = "device")
+    @Where(clause = "deallocatedAt IS NULL")
+    private Set<DeviceUserAssoc> allocatedToUsersAssocSet = new HashSet<>();
+
 
     public Device() {
     }
@@ -51,5 +58,13 @@ public class Device {
 
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
+    }
+
+    public Set<DeviceUserAssoc> getAllocatedToUsersAssocSet() {
+        return allocatedToUsersAssocSet;
+    }
+
+    public void setAllocatedToUsersAssocSet(Set<DeviceUserAssoc> allocatedToUsersAssocSet) {
+        this.allocatedToUsersAssocSet = allocatedToUsersAssocSet;
     }
 }

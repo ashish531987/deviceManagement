@@ -4,7 +4,7 @@ import com.emergent.devicemgmt.domain.Device;
 import com.emergent.devicemgmt.domain.DeviceUserAssoc;
 import com.emergent.devicemgmt.domain.User;
 import com.emergent.devicemgmt.domain.dto.DeviceAllocationDTO;
-import com.emergent.devicemgmt.domain.exception.DeviceAlreadyAllocatedException;
+import com.emergent.devicemgmt.domain.exception.DeviceAllocatedException;
 import com.emergent.devicemgmt.domain.exception.DeviceNotFoundException;
 import com.emergent.devicemgmt.domain.exception.ExceptionResponse;
 import com.emergent.devicemgmt.service.DeviceService;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -40,12 +39,12 @@ public class DeviceResource {
     @Autowired
     private UserService userService;
 
-    @GetMapping(path= REST_GET_DEVICES, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path= REST_GET_DEVICES, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Object> devices(){
         return ResponseEntity.ok(deviceService.getAllDevices());
     }
 
-    @GetMapping(path= REST_GET_DEVICE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path= REST_GET_DEVICE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Optional<Device> device(@PathVariable("id") String uniqueId){
         Optional<Device> deviceOptional = deviceService.getDeviceForUniqueId(uniqueId);
         if(deviceOptional.isPresent())
@@ -54,7 +53,7 @@ public class DeviceResource {
             throw new DeviceNotFoundException(uniqueId);
     }
 
-    @PutMapping(path= REST_ALLOCATE_DEVICE, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path= REST_ALLOCATE_DEVICE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Object> allocateDevice(
             @NotBlank @PathVariable("id") String uniqueId,
             @Valid @RequestBody DeviceAllocationDTO deviceAllocationDTO){
@@ -68,9 +67,9 @@ public class DeviceResource {
 
         if(device != null && device.isPresent()){
             // Device found
-            Set<DeviceUserAssoc> deviceUserAssoc = device.get().getDeviceUserAssocSet();
+            Set<DeviceUserAssoc> deviceUserAssoc = device.get().getAllocatedToUsersAssocSet();
             if(deviceUserAssoc.isEmpty()){
-                // Device not allocated
+                // Device not allocated to any user
                 DeviceUserAssoc deviceUserAssoc1 = new DeviceUserAssoc();
                 deviceUserAssoc1.setUser(user);
                 deviceUserAssoc1.setDevice(device.get());
@@ -80,8 +79,19 @@ public class DeviceResource {
                 deviceService.save(deviceUserAssoc1);
                 return ResponseEntity.ok().build();
             } else{
+                // Check if device is allocated to current user
+                for(DeviceUserAssoc deviceUserAssoc1 : deviceUserAssoc){
+                    if(deviceUserAssoc1.getUser().getEmail().equalsIgnoreCase(user.getEmail())){
+                        // Allocation of this device to this user has been found
+                        deviceUserAssoc1.setAllocationInterval(deviceAllocationDTO.getAllocationInterval());
+                        deviceUserAssoc1.setAllocatedAt(new Date());
+                        deviceUserAssoc1.setDeallocatedAt(null);
+                        deviceService.save(deviceUserAssoc1);
+                        return ResponseEntity.ok().build();
+                    }
+                }
                 // Device already allocated
-                throw new DeviceAlreadyAllocatedException(uniqueId);
+                throw new DeviceAllocatedException(uniqueId);
             }
         } else {
             // Device not found raise exception
@@ -91,16 +101,31 @@ public class DeviceResource {
     }
 
 
-    @PutMapping(path=REST_DEALLOCATE_DEVICE, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> deallocateDevice(@PathVariable("id") String uniqueId){
+    @PutMapping(path=REST_DEALLOCATE_DEVICE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<Object> deallocateDevice(@NotBlank @PathVariable("id") String uniqueId){
         // Step 1 Retrieve logged in user information.
         User user = getLoggedInUser();
 
         // Step 2 check if device NOT allocated to any other user.
         Optional<Device> device =
                 deviceService.getDeviceForUniqueId(uniqueId);
-        return ResponseEntity.ok().build();
-
+        if(device != null && device.isPresent()){
+            // Device found
+            Set<DeviceUserAssoc> deviceUserAssoc = device.get().getAllocatedToUsersAssocSet();
+            for(DeviceUserAssoc deviceUserAssoc1 : deviceUserAssoc){
+                if(deviceUserAssoc1.getUser().getEmail().equalsIgnoreCase(user.getEmail())){
+                    // Allocation of this device to this user has been found
+                    deviceUserAssoc1.setDeallocatedAt(new Date());
+                    deviceService.save(deviceUserAssoc1);
+                    return ResponseEntity.ok().build();
+                }
+            }
+            // Device already allocated
+            throw new DeviceAllocatedException(uniqueId);
+        } else {
+            // Device not found raise exception
+            throw new DeviceNotFoundException(uniqueId);
+        }
     }
     /**
      * User instance of currently logged in user.

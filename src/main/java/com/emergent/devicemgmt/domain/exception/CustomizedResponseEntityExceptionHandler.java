@@ -30,9 +30,9 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(DeviceAlreadyAllocatedException.class)
+    @ExceptionHandler(DeviceAllocatedException.class)
     public final ResponseEntity<ExceptionResponse> handleDeviceAlreadyAllocatedException(
-            DeviceAlreadyAllocatedException ex,
+            DeviceAllocatedException ex,
             WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
                 request.getDescription(false));
