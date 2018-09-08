@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class DeviceAlreadyAllocatedException extends RuntimeException {
-    public DeviceAlreadyAllocatedException(String message) {
-        super(message);
+    public DeviceAlreadyAllocatedException(String deviceId) {
+        super(deviceId+" device is already allocated to some other user!");
     }
 }

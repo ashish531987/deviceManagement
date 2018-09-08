@@ -15,6 +15,8 @@ import javax.annotation.PostConstruct;
 
 @SpringBootApplication
 public class DevicemgmtApplication {
+/*
+	This commented code is to populate test data while testing with actual database server.
 	@Autowired
 	UserJpaRepository userJpaRepository;
 
@@ -26,10 +28,12 @@ public class DevicemgmtApplication {
 
 	@Autowired
 	DeviceJpaRepository deviceJpaRepository;
+*/
 
 	public static void main(String[] args) {
 		SpringApplication.run(DevicemgmtApplication.class, args);
 	}
+/*
 	@PostConstruct
 	private void populateDB(){
 		// Role Admin
@@ -90,4 +94,5 @@ public class DevicemgmtApplication {
 		device1.setUniqueId("1234456767");
 		deviceJpaRepository.save(device1);
 	}
+*/
 }

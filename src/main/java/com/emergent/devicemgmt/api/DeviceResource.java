@@ -30,18 +30,22 @@ import java.util.Set;
 @RestController
 
 public class DeviceResource {
+    public static final String REST_GET_DEVICES = "/devices";
+    public static final String REST_GET_DEVICE = "/device/{id}";
+    public static final String REST_ALLOCATE_DEVICE = REST_GET_DEVICE+"/allocate";
+    public static final String REST_DEALLOCATE_DEVICE = REST_GET_DEVICE+"/deallocate";
     @Autowired
     private DeviceService deviceService;
 
     @Autowired
     private UserService userService;
 
-    @GetMapping(path="/devices", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Device> devices(){
-        return  deviceService.getAllDevices();
+    @GetMapping(path= REST_GET_DEVICES, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> devices(){
+        return ResponseEntity.ok(deviceService.getAllDevices());
     }
 
-    @GetMapping(path="/device/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path= REST_GET_DEVICE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<Device> device(@PathVariable("id") String uniqueId){
         Optional<Device> deviceOptional = deviceService.getDeviceForUniqueId(uniqueId);
         if(deviceOptional.isPresent())
@@ -50,7 +54,7 @@ public class DeviceResource {
             throw new DeviceNotFoundException(uniqueId);
     }
 
-    @PutMapping(path="/device/{id}/allocate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path= REST_ALLOCATE_DEVICE, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> allocateDevice(
             @NotBlank @PathVariable("id") String uniqueId,
             @Valid @RequestBody DeviceAllocationDTO deviceAllocationDTO){
@@ -77,17 +81,17 @@ public class DeviceResource {
                 return ResponseEntity.ok().build();
             } else{
                 // Device already allocated
-                throw new DeviceAlreadyAllocatedException(uniqueId+" device is already allocated to some other user!");
+                throw new DeviceAlreadyAllocatedException(uniqueId);
             }
         } else {
             // Device not found raise exception
-            throw new DeviceNotFoundException(uniqueId+" device not found. Please register this device first and try again!");
+            throw new DeviceNotFoundException(uniqueId);
         }
 
     }
 
 
-    @PutMapping(path="/device/{id}/deallocate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path=REST_DEALLOCATE_DEVICE, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> deallocateDevice(@PathVariable("id") String uniqueId){
         // Step 1 Retrieve logged in user information.
         User user = getLoggedInUser();
